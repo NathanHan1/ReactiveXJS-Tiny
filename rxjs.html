@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.2/rxjs.umd.js"></script>
+    <style>
+      #app {
+        width: 300px;
+        height: 300px;
+        background: pink;
+      }
+    </style>
+  </head>
+  <body id="bb">
+    <div id="app">
+      <input type="text" id="ipt">
+    </div>
+    <script>
+      const { fromEvent, Observable, from, of, Subject, asyncScheduler, asapScheduler } = rxjs;
+      const { scan, throttleTime, debounceTime, map, first, second, delay, observeOn } = rxjs.operators;
+
+      ipt.addEventListener('keydown', e => console.log(e))
+      app.addEventListener('keydown', e => console.log('sdfsdf'))
+      
+      // fromEvent(app, 'click')
+      //   .pipe(
+      //     map(e => e.clientX),
+      //     mydelay(1000),
+      //     scan(
+      //       (count, clientX) => {
+      //         count.clientX = clientX;
+      //         return count;
+      //       },
+      //       { name: 'hzb', age: 12 }
+      //     )
+      //   )
+      //   .subscribe(count => console.log(count));
+
+      // function mydelay(delayInMillis) {
+      //   return observable =>
+      //     new Observable(observer => {
+      //       // this function will called each time this
+      //       // Observable is subscribed to.
+      //       const allTimerIDs = new Set();
+      //       const subscription = observable.subscribe({
+      //         next(value) {
+      //           const timerID = setTimeout(() => {
+      //             observer.next(value);
+      //             allTimerIDs.delete(timerID);
+      //           }, delayInMillis);
+      //           allTimerIDs.add(timerID);
+      //         },
+      //         error(err) {
+      //           observer.error(err);
+      //         },
+      //         complete() {
+      //           observer.complete();
+      //         }
+      //       });
+      //       // the return value is the teardown function,
+      //       // which will be invoked when the new
+      //       // Observable is unsubscribed from.
+      //       return () => {
+      //         subscription.unsubscribe();
+      //         allTimerIDs.forEach(timerID => {
+      //           clearTimeout(timerID);
+      //         });
+      //       };
+      //     });
+      // }
+
+      var observable1 = new Observable(proxyObserver => {
+        proxyObserver.next(1);
+        proxyObserver.next(2);
+        proxyObserver.next(3);
+        proxyObserver.complete();
+      }).pipe(observeOn(asyncScheduler));
+
+      var observable2 = new Observable(proxyObserver => {
+        proxyObserver.next(777);
+        proxyObserver.complete();
+      }).pipe(observeOn(asapScheduler));
+
+      var finalObserver = {
+        next(x) {
+          console.log('got value ' + x);
+        },
+        error(err) {
+          console.error('something wrong occurred: ' + err);
+        },
+        complete() {
+          console.log('done');
+        }
+      };
+
+      observable1.subscribe(finalObserver);
+      observable2.subscribe(finalObserver);
+
+    </script>
+  </body>
+</html>
